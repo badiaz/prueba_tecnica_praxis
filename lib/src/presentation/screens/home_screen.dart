@@ -3,8 +3,93 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:praxis_tareas_app/src/presentation/blocs/task/task_bloc.dart';
 import 'package:praxis_tareas_app/src/presentation/widgets/task_card.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final TextEditingController _taskTitleController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration.zero, () {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Swipe to delete a task'),
+          ),
+        );
+      }
+    });
+  }
+
+  @override
+  void dispose() {
+    _taskTitleController.dispose();
+    super.dispose();
+  }
+
+  void _showAddTaskDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text(
+            'Add New task',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: TextFormField(
+            controller: _taskTitleController,
+            cursorColor: Colors.black,
+            decoration: const InputDecoration(
+              hintText: 'Title',
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: Colors.black, width: 2.0),
+              ),
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text(
+                'Cancel',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text(
+                'Create',
+                style: TextStyle(color: Colors.black),
+              ),
+              onPressed: () {
+                final String taskTitle = _taskTitleController.text;
+                if (taskTitle.isNotEmpty) {
+                  context.read<TaskBloc>().add(AddTaskEvent(taskTitle));
+
+                  Navigator.of(context).pop();
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('El título no puede estar vacío'),
+                    ),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -93,61 +178,4 @@ class _HomeHeader extends StatelessWidget {
       ),
     );
   }
-}
-
-void _showAddTaskDialog(BuildContext context) {
-  final TextEditingController taskTitleController = TextEditingController();
-
-  showDialog(
-    context: context,
-    builder: (BuildContext context) {
-      return AlertDialog(
-        title: const Text('New task'),
-        content: TextFormField(
-          controller: taskTitleController,
-          cursorColor: Colors.black,
-          decoration: const InputDecoration(
-            hintText: 'Title',
-            enabledBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.black),
-            ),
-            focusedBorder: UnderlineInputBorder(
-              borderSide: BorderSide(color: Colors.black, width: 2.0),
-            ),
-          ),
-        ),
-        actions: <Widget>[
-          TextButton(
-            child: const Text(
-              'Cancel',
-              style: TextStyle(color: Colors.black),
-            ),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-          TextButton(
-            child: const Text(
-              'Create',
-              style: TextStyle(color: Colors.black),
-            ),
-            onPressed: () {
-              final String taskTitle = taskTitleController.text;
-              if (taskTitle.isNotEmpty) {
-                context.read<TaskBloc>().add(AddTaskEvent(taskTitle));
-
-                Navigator.of(context).pop();
-              } else {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('El título no puede estar vacío'),
-                  ),
-                );
-              }
-            },
-          ),
-        ],
-      );
-    },
-  );
 }

@@ -18,7 +18,9 @@ class TaskCard extends StatelessWidget {
         background: Container(
           alignment: Alignment.centerRight,
           padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          color: Colors.redAccent,
+          decoration: const BoxDecoration(
+              color: Colors.redAccent,
+              borderRadius: BorderRadius.all(Radius.circular(20.0))),
           child: const Icon(
             Icons.delete,
             color: Colors.white,
@@ -89,7 +91,7 @@ class TaskCard extends StatelessWidget {
                           const SizedBox(width: 10.0),
                           Checkbox(
                             value: task.completed,
-                            activeColor: Colors.blueAccent,
+                            activeColor: Colors.black,
                             onChanged: (value) {
                               context.read<TaskBloc>().add(
                                     UpdateTaskCompletedEvent(task.id!, value!),
